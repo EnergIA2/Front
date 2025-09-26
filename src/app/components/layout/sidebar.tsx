@@ -3,13 +3,8 @@
 import { useState } from "react"
 import {
   BarChart3,
-  Brain,
-  Cpu,
-  Zap,
   Settings,
-  HelpCircle,
   FileText,
-  Calendar,
   Shield,
   TrendingUp,
   ChevronLeft,
@@ -17,7 +12,7 @@ import {
 } from "lucide-react"
 
 interface SidebarItem {
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   label: string
   href: string
   badge?: number
@@ -94,7 +89,7 @@ export function Sidebar({ activeSection, onSectionChange, onCollapseChange }: Si
       <div className="flex flex-col h-full">
         {/* Main navigation */}
         <nav className="flex-1 px-3 py-6 space-y-2">
-          {menuItems.map((item, index) => (
+          {menuItems.map((item) => (
             <div key={item.href} className="space-y-1">
               <button
                 onClick={() => onSectionChange(item.href)}

@@ -1,20 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { 
-  TrendingUp, 
-  Zap, 
-  Target, 
+import {
+  TrendingUp,
+  Target,
   Clock,
   DollarSign,
-  Leaf,
-  Settings,
-  CheckCircle,
-  AlertTriangle,
   ArrowRight,
-  Calendar,
   BarChart3,
-  Activity
+  Zap
 } from "lucide-react"
 import { useCityContext } from "../layout/city-selector"
 
@@ -32,12 +26,12 @@ interface OptimizationCard {
 }
 
 export function OptimizationSection() {
-  const { selectedCity, cities, getCityData } = useCityContext()
+  const { selectedCity, getCityData } = useCityContext()
   const [activeTab, setActiveTab] = useState<'recommendations' | 'predictions' | 'benchmarks'>('recommendations')
 
   // Datos de optimización basados en la ciudad seleccionada
   const getOptimizationData = () => {
-    const cityData = selectedCity === 'todas' ? null : getCityData(selectedCity)
+    // const cityData = selectedCity === 'todas' ? null : getCityData(selectedCity)
     
     const recommendations: OptimizationCard[] = [
       {
@@ -159,7 +153,7 @@ export function OptimizationSection() {
         ].map(tab => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as any)}
+            onClick={() => setActiveTab(tab.key as 'recommendations' | 'predictions' | 'benchmarks')}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'bg-[var(--card)] text-[var(--primary)] shadow-sm'

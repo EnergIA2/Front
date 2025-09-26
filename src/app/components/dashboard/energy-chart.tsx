@@ -62,14 +62,22 @@ export function EnergyChart() {
     return () => clearInterval(interval)
   }, [])
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: {
+    active?: boolean;
+    payload?: Array<{
+      name: string;
+      value: number;
+      color: string;
+    }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div className="p-4 rounded-lg glass-effect border border-[var(--border)]">
           <p className="text-sm font-medium text-[var(--foreground)] mb-2">
             {label}
           </p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name === 'consumption' && 'Consumo: '}
               {entry.name === 'prediction' && 'Predicción IA: '}

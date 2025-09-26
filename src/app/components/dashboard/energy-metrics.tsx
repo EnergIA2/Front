@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Zap, TrendingDown, TrendingUp, DollarSign, Leaf, AlertTriangle, MapPin, CheckCircle } from "lucide-react"
+import { Zap, TrendingDown, TrendingUp, DollarSign, AlertTriangle, MapPin, CheckCircle } from "lucide-react"
 import { useCityContext } from "../layout/city-selector"
 
 interface EnergyMetric {
   label: string
   value: string
   change: number
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   color: string
   unit: string
   status: 'Normal' | 'Alerta' | 'Crítico'
