@@ -1,22 +1,19 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { Header } from "./components/layout/header"
 import { Sidebar } from "./components/layout/sidebar"
 import { CityProvider } from "./components/layout/city-selector"
 import { EnergyMetrics } from "./components/dashboard/energy-metrics"
-import { EnergyChart } from "./components/dashboard/energy-chart"
 import { RecentConsumptionChart } from "./components/dashboard/recent-consumption-chart"
 import { ConsumptionHeatMap } from "./components/dashboard/consumption-heatmap"
-import { EfficiencyVisualChart } from "./components/dashboard/efficiency-visual-chart"
-import { CostSavingsChart } from "./components/dashboard/cost-savings-chart"
+import { EquipmentDistributionChart } from "./components/dashboard/equipment-distribution-chart"
+import { BenchmarkingVsMeta } from "./components/dashboard/benchmarking-vs-meta"
+import { HistorySection } from "./components/dashboard/history-section"
+import { AIRecommendations } from "./components/ai/recommendations"
 import { ReportsSection } from "./components/reports/reports-section"
-import { EmisSection } from "./components/emis/emis-section"
-import { PredictionSection } from "./components/prediction/prediction-section"
 import { AlertsSection } from "./components/alerts/alerts-section"
-import { OptimizationSection } from "./components/optimization/optimization-section"
 import { Chatbot } from "./components/chatbot/chatbot"
-import { LiveTime } from "./components/live-time"
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("dashboard")
@@ -24,12 +21,10 @@ export default function Home() {
 
   const renderContent = () => {
     switch (activeSection) {
+      case "history":
+        return <HistorySection />
       case "alerts":
         return <AlertsSection />
-      case "prediction":
-        return <PredictionSection />
-      case "emis":
-        return <EmisSection />
       case "reports":
         return <ReportsSection />
       case "analytics":
@@ -69,20 +64,7 @@ export default function Home() {
                     Visualiza tu rendimiento energético comparado con estándares del sector
                   </p>
                 </div>
-                <EfficiencyVisualChart />
-              </div>
-
-              {/* Análisis Costo-Beneficio */}
-              <div>
-                <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 p-6 rounded-xl border-l-4 border-orange-500 mb-4">
-                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-2 flex items-center gap-2">
-                    💰 Análisis de Ahorros
-                  </h2>
-                  <p className="text-sm text-[var(--muted-foreground)] mb-2">
-                    Oportunidades de ahorro identificadas y proyección de beneficios
-                  </p>
-                </div>
-                <CostSavingsChart />
+                <EquipmentDistributionChart />
               </div>
             </div>
           </div>
@@ -105,111 +87,55 @@ export default function Home() {
             </div>
           </div>
         )
-      case "optimization":
-        return <OptimizationSection />
+      case "recommendations":
+        return <AIRecommendations />
       default: // dashboard
         return (
-          <>
-            {/* Welcome Section */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-[var(--foreground)] mb-1">
-                    Vista General
-                  </h1>
-                  <p className="text-sm text-[var(--muted-foreground)]">
-                    Panel de control energético empresarial
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-[var(--muted-foreground)]">Última actualización</div>
-                  <div className="text-sm font-medium text-[var(--foreground)]">
-                    <LiveTime />
-                  </div>
-                </div>
-              </div>
+          <div className="space-y-4 md:space-y-6">
+            {/* Header */}
+            <div className="px-1">
+              <h1 className="text-xl md:text-2xl font-bold text-[var(--foreground)] mb-1">
+                Dashboard Energético
+              </h1>
+              <p className="text-xs md:text-sm text-[var(--muted-foreground)]">
+                Monitoreo, análisis y proyecciones de consumo
+              </p>
             </div>
 
-            {/* Key Metrics - Simplified */}
-            <EnergyMetrics />
+            {/* KPIs Principales */}
+            <div className="w-full">
+              <EnergyMetrics />
+            </div>
 
-            {/* Quick Actions & Alerts */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
-              {/* Quick Status */}
-              <div className="xl:col-span-2">
+            {/* Main Charts Grid - Responsive */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+              {/* Gráfico de Consumo */}
+              <div className="xl:col-span-2 bg-[var(--card)] rounded-lg md:rounded-xl border border-[var(--border)] shadow-sm">
                 <RecentConsumptionChart />
               </div>
+            </div>
 
-              {/* Action Center */}
-              <div className="space-y-6">
-                <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-sm">
-                  <h3 className="text-lg font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
-                    ⚡ Acciones Rápidas
-                  </h3>
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => setActiveSection('optimization')}
-                      className="w-full p-4 text-left rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border border-green-200 dark:border-green-800 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-950/30 dark:hover:to-emerald-950/30 transition-all duration-200"
-                    >
-                      <div className="font-medium text-green-700 dark:text-green-300">Ver Optimizaciones</div>
-                      <div className="text-xs text-green-600 dark:text-green-400 mt-1">S/ 4,977/mes ahorro potencial</div>
-                    </button>
-
-                    <button
-                      onClick={() => setActiveSection('alerts')}
-                      className="w-full p-4 text-left rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border border-orange-200 dark:border-orange-800 hover:from-orange-100 hover:to-amber-100 dark:hover:from-orange-950/30 dark:hover:to-amber-950/30 transition-all duration-200"
-                    >
-                      <div className="font-medium text-orange-700 dark:text-orange-300">3 Alertas Activas</div>
-                      <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">Revisar base nocturna elevada</div>
-                    </button>
-
-                    <button
-                      onClick={() => setActiveSection('reports')}
-                      className="w-full p-4 text-left rounded-lg bg-[var(--muted)] hover:bg-[var(--secondary)] border border-[var(--border)] transition-all duration-200"
-                    >
-                      <div className="font-medium text-[var(--foreground)]">Generar Reporte</div>
-                      <div className="text-xs text-[var(--muted-foreground)] mt-1">Resumen mensual</div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Current Status */}
-                <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-sm">
-                  <h3 className="text-lg font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
-                    📊 Estado Actual
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-[var(--muted-foreground)]">Eficiencia</span>
-                      <div className="flex items-center gap-3">
-                        <div className="w-20 bg-[var(--muted)] rounded-full h-2.5">
-                          <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-2.5 rounded-full w-[89%]"></div>
-                        </div>
-                        <span className="text-sm font-bold text-green-600 min-w-[35px]">89%</span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-[var(--muted-foreground)]">vs. Meta Sectorial</span>
-                      <span className="text-sm font-bold text-green-600">+12.2%</span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-[var(--muted-foreground)]">Ahorro Este Mes</span>
-                      <span className="text-sm font-bold text-orange-600">S/ 2,847</span>
-                    </div>
-                  </div>
-                </div>
+            {/* Secondary Analytics */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+              {/* Patrones de Uso */}
+              <div className="lg:col-span-2 bg-[var(--card)] rounded-lg md:rounded-xl border border-[var(--border)] shadow-sm">
+                <ConsumptionHeatMap />
               </div>
             </div>
 
-            {/* Main Performance Chart */}
-            <div className="w-full">
-              <EnergyChart />
-            </div>
+            {/* Metrics Grid - Mobile First */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 lg:gap-6">
+              {/* Rendimiento vs Objetivos */}
+              <div className="bg-[var(--card)] rounded-lg md:rounded-xl border border-[var(--border)] shadow-sm">
+                <BenchmarkingVsMeta />
+              </div>
 
-          
-          </>
+              {/* Distribución por Categorías */}
+              <div className="bg-[var(--card)] rounded-lg md:rounded-xl border border-[var(--border)] shadow-sm">
+                <EquipmentDistributionChart />
+              </div>
+            </div>
+          </div>
         )
     }
   }
@@ -220,9 +146,9 @@ export default function Home() {
         <Header />
 
         <div className="flex">
-          <Sidebar 
-            activeSection={activeSection} 
-            onSectionChange={setActiveSection} 
+          <Sidebar
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
             onCollapseChange={setSidebarCollapsed}
           />
 

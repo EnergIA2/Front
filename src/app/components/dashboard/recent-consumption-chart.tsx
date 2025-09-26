@@ -11,9 +11,10 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  ChartOptions,
+  TooltipItem
 } from "chart.js"
-import { useCityContext } from "../layout/city-selector"
 
 ChartJS.register(
   CategoryScale,
@@ -26,110 +27,141 @@ ChartJS.register(
   Filler
 )
 
-interface EquipmentData {
-  name: string
-  consumption: number
-  percentage: number
-  color: string
-  status: 'normal' | 'high' | 'low'
-}
-
 export function RecentConsumptionChart() {
-  const { selectedCity } = useCityContext()
   const [mounted, setMounted] = useState(false)
-  const [timeLabels] = useState([
-    '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00'
-  ])
+  const [currentTime, setCurrentTime] = useState("")
 
-  // Datos simulados de consumo por equipo con paleta verde-naranja
-  const equipmentData: EquipmentData[] = [
-    {
-      name: 'HVAC Principal',
-      consumption: 15.2,
-      percentage: 42,
-      color: '#F97316', // Naranja principal para el mayor consumo
-      status: 'high'
-    },
-    {
-      name: 'Iluminación',
-      consumption: 8.7,
-      percentage: 24,
-      color: '#10B981', // Verde principal
-      status: 'normal'
-    },
-    {
-      name: 'Equipos Oficina',
-      consumption: 6.3,
-      percentage: 17,
-      color: '#FB923C', // Naranja claro
-      status: 'normal'
-    },
-    {
-      name: 'Servidores',
-      consumption: 4.2,
-      percentage: 12,
-      color: '#22C55E', // Verde claro
-      status: 'normal'
-    },
-    {
-      name: 'Otros',
-      consumption: 1.8,
-      percentage: 5,
-      color: '#16A34A', // Verde oscuro
-      status: 'low'
+  // Generate time labels for 3-hour window (from 05:53 to 08:53, every 10 minutes)
+  const generateTimeLabels = () => {
+    const labels = []
+    const now = new Date()
+    
+    // Create 3-hour window: 1.5 hours before current time, 1.5 hours after
+    const startTime = new Date(now.getTime() - 1.5 * 60 * 60 * 1000) // 1.5 hours ago
+    const endTime = new Date(now.getTime() + 1.5 * 60 * 60 * 1000) // 1.5 hours ahead
+    
+    for (let time = new Date(startTime); time <= endTime; time.setMinutes(time.getMinutes() + 10)) {
+      const hours = time.getHours().toString().padStart(2, '0')
+      const minutes = time.getMinutes().toString().padStart(2, '0')
+      labels.push(`${hours}:${minutes}`)
     }
-  ]
+    
+    return labels
+  }
 
-  // Generar datos de línea de tiempo
-  const generateTimelineData = useCallback(() => {
-    const baseValue = selectedCity === 'todas' ? 38 : 
-                     selectedCity === 'lima' ? 12.8 :
-                     selectedCity === 'arequipa' ? 10.4 : 15.3
+  const timeLabels = generateTimeLabels()
 
-    return timeLabels.map((_, index) => {
-      // Use deterministic variation based on index and city to avoid hydration mismatch
-      const variation = Math.sin(index * 0.8) * 2 + Math.sin(index * 1.2) * 1.5
-      return Math.max(baseValue + variation, baseValue * 0.8)
-    })
-  }, [selectedCity, timeLabels])
+  // Generate main consumption data (historical)
+  const generateMainConsumptionData = useCallback(() => {
+    const data = []
+    const currentTimeIndex = Math.floor(timeLabels.length / 2) // Current time is in the middle
+
+    for (let i = 0; i < timeLabels.length; i++) {
+      if (i <= currentTimeIndex) {
+        // Historical data with realistic pattern
+        const baseValue = 60
+        
+        // Add some variation based on time pattern
+        const timeVariation = Math.sin(i * 0.3) * 8
+        const randomVariation = (Math.random() - 0.5) * 6
+        
+        const value = Math.max(50, Math.min(75, baseValue + timeVariation + randomVariation))
+        data.push(Math.round(value))
+      } else {
+        // No historical data after current time
+        data.push(null)
+      }
+    }
+    return data
+  }, [timeLabels])
+
+  // Generate forecast data
+  const generateForecastData = useCallback(() => {
+    const data = []
+    const currentTimeIndex = Math.floor(timeLabels.length / 2)
+
+    for (let i = 0; i < timeLabels.length; i++) {
+      if (i < currentTimeIndex) {
+        // No forecast before current time
+        data.push(null)
+      } else {
+        // Forecast data with declining pattern
+        const futurePoints = i - currentTimeIndex
+        const baseValue = 50 - (futurePoints * 2)
+        const variation = Math.sin(futurePoints * 0.4) * 4
+        const value = Math.max(3, Math.min(15, baseValue + variation))
+        data.push(Math.round(value))
+      }
+    }
+    return data
+  }, [timeLabels])
+
 
   const [chartData, setChartData] = useState(() => ({
     labels: timeLabels,
     datasets: [
       {
-        label: 'Consumo (kWh)',
-        data: generateTimelineData(),
-        borderColor: '#10B981', // Verde principal
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        pointBackgroundColor: '#10B981',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2
+        label: 'Consumo Actual',
+        data: generateMainConsumptionData(),
+        borderColor: '#6B7280', // Gris como en la imagen
+        backgroundColor: 'transparent',
+        fill: false,
+        tension: 0.1,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#6B7280',
+        pointBorderColor: '#6B7280',
+        pointBorderWidth: 1,
+        borderWidth: 2,
+        spanGaps: false
+      },
+      {
+        label: 'Pronóstico',
+        data: generateForecastData(),
+        borderColor: '#3B82F6', // Azul para pronóstico
+        backgroundColor: 'transparent',
+        fill: false,
+        tension: 0.1,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#3B82F6',
+        pointBorderColor: '#3B82F6',
+        pointBorderWidth: 1,
+        borderWidth: 2,
+        borderDash: [5, 5], // Línea punteada
+        spanGaps: false
       }
     ]
   }))
 
-  const chartOptions = {
+  const chartOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false
+        display: true,
+        position: 'bottom' as const,
+        labels: {
+          usePointStyle: true,
+          color: '#6B7280',
+          font: {
+            size: 12
+          },
+          padding: 20
+        }
       },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         titleColor: '#ffffff',
         bodyColor: '#ffffff',
-        borderColor: 'rgba(16, 185, 129, 0.5)',
+        borderColor: '#374151',
         borderWidth: 1,
-        cornerRadius: 8,
+        cornerRadius: 6,
         displayColors: false,
         callbacks: {
-          label: function(context: { parsed: { y: number } }) {
-            return `${context.parsed.y.toFixed(2)} kWh`
+          label: function(context: TooltipItem<'line'>) {
+            if (context.parsed.y === null) return ''
+            return `${context.parsed.y} kWh`
           }
         }
       }
@@ -137,28 +169,37 @@ export function RecentConsumptionChart() {
     scales: {
       x: {
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false
+          display: true,
+          color: '#F3F4F6'
         },
         ticks: {
-          color: '#9CA3AF',
+          color: '#6B7280',
           font: {
-            size: 11
-          }
+            size: 10
+          },
+          maxTicksLimit: 10
         }
       },
       y: {
+        min: 0,
+        max: 80,
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-          drawBorder: false
+          display: true,
+          color: '#F3F4F6'
         },
         ticks: {
-          color: '#9CA3AF',
+          color: '#6B7280',
           font: {
             size: 11
           },
-          callback: function(value: string | number) {
-            return Number(value).toFixed(1) + ' kWh'
+          stepSize: 20
+        },
+        title: {
+          display: true,
+          text: 'kWh',
+          color: '#6B7280',
+          font: {
+            size: 12
           }
         }
       }
@@ -169,149 +210,126 @@ export function RecentConsumptionChart() {
     }
   }
 
-  // Set mounted state and update data when city changes
   useEffect(() => {
     setMounted(true)
-    setChartData(prev => ({
-      ...prev,
-      datasets: [{
-        ...prev.datasets[0],
-        data: generateTimelineData()
-      }]
-    }))
-  }, [selectedCity, generateTimelineData])
 
-  const getStatusColor = (status: EquipmentData['status']) => {
-    switch (status) {
-      case 'high': return 'text-red-500'
-      case 'low': return 'text-yellow-500'
-      default: return 'text-green-500'
+    // Update current time
+    const updateTime = () => {
+      const now = new Date()
+      const timeString = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`
+      setCurrentTime(timeString)
     }
-  }
 
-  const getStatusLabel = (status: EquipmentData['status']) => {
-    switch (status) {
-      case 'high': return 'Alto'
-      case 'low': return 'Bajo'
-      default: return 'Normal'
+    updateTime()
+    const timeInterval = setInterval(updateTime, 1000)
+
+    // Update data every 30 seconds to simulate real-time
+    const dataInterval = setInterval(() => {
+      setChartData(prev => ({
+        ...prev,
+        datasets: [
+          {
+            ...prev.datasets[0],
+            data: generateMainConsumptionData()
+          },
+          {
+            ...prev.datasets[1],
+            data: generateForecastData()
+          }
+        ]
+      }))
+    }, 30000)
+
+    return () => {
+      clearInterval(timeInterval)
+      clearInterval(dataInterval)
     }
-  }
+  }, [generateMainConsumptionData, generateForecastData])
 
   if (!mounted) {
     return (
       <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="text-lg font-bold text-[var(--foreground)]">
-              Monitoreo en Tiempo Real
-            </h3>
-            <p className="text-sm text-[var(--muted-foreground)]">
-              Consumo por equipos • Última hora
-            </p>
-          </div>
-          
-          <div className="text-right">
-            <div className="text-2xl font-bold text-[var(--foreground)]">
-              --.- kWh
-            </div>
-            <div className="text-xs text-[var(--muted-foreground)] flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-[var(--muted)]"></div>
-              Cargando...
-            </div>
-          </div>
+        <div className="mb-4">
+          <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">
+            Consumo Horario
+          </h3>
+          <p className="text-sm text-[var(--muted-foreground)]">
+            Cargando datos...
+          </p>
         </div>
-        <div className="h-48 mb-6 bg-[var(--muted)] rounded-lg animate-pulse"></div>
-        <div className="space-y-3 mb-4">
-          <h4 className="text-sm font-medium text-[var(--foreground)]">
-            Consumo por Equipo
-          </h4>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-[var(--muted)] animate-pulse">
-              <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full bg-[var(--secondary)]" />
-                <span className="w-20 h-4 bg-[var(--secondary)] rounded"></span>
-              </div>
-              <div className="text-right">
-                <div className="w-12 h-4 bg-[var(--secondary)] rounded mb-1"></div>
-                <div className="w-8 h-3 bg-[var(--secondary)] rounded"></div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="h-80 bg-[var(--muted)] rounded-lg animate-pulse"></div>
       </div>
     )
   }
 
   return (
     <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h3 className="text-lg font-bold text-[var(--foreground)]">
-            Monitoreo en Tiempo Real
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: '#ff9a9e' }}></div>
+          <h3 className="text-lg font-semibold text-[var(--foreground)]">
+            Consumo en Tiempo Real
           </h3>
-          <p className="text-sm text-[var(--muted-foreground)]">
-            Consumo por equipos • Última hora
-          </p>
         </div>
-        
-        <div className="text-right">
-          <div className="text-2xl font-bold text-[var(--foreground)]">
-            {chartData.datasets[0].data[chartData.datasets[0].data.length - 1].toFixed(1)} kWh
-          </div>
-          <div className="text-xs text-[var(--success)] flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse"></div>
-            Ahora • {selectedCity === 'todas' ? 'Todas las sedes' : 'Sede actual'}
-          </div>
+        <div className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
+          <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+          <span>Actualizado: {currentTime}</span>
         </div>
       </div>
 
-      {/* Chart */}
-      <div className="h-48 mb-6">
+      <div className="h-64 sm:h-80 relative">
         <Line data={chartData} options={chartOptions} />
-      </div>
-
-      {/* Equipment Breakdown */}
-      <div className="space-y-3 mb-4">
-        <h4 className="text-sm font-medium text-[var(--foreground)]">
-          Consumo por Equipo
-        </h4>
-        
-        {equipmentData.map((equipment) => (
-          <div
-            key={equipment.name}
-            className="flex items-center justify-between p-3 rounded-lg bg-[var(--muted)] hover:bg-[var(--secondary)] transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: equipment.color }}
-              />
-              <span className="text-sm font-medium text-[var(--foreground)]">
-                {equipment.name}
-              </span>
-              <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(equipment.status)}`}>
-                {getStatusLabel(equipment.status)}
-              </span>
-            </div>
-            
-            <div className="text-right">
-              <div className="text-sm font-bold text-[var(--foreground)]">
-                {equipment.consumption.toFixed(1)} kWh
-              </div>
-              <div className="text-xs text-[var(--muted-foreground)]">
-                {equipment.percentage}%
-              </div>
-            </div>
+        {/* Current time vertical line - red dashed like in the image */}
+        <div
+          className="absolute w-px bg-red-500 opacity-70"
+          style={{
+            left: '50%', // Current time is in the middle
+            top: '20px',
+            height: 'calc(100% - 60px)',
+            zIndex: 10,
+            borderLeft: '2px dashed #EF4444'
+          }}
+        >
+          {/* Top label */}
+          <div className="absolute -top-6 -left-12 text-red-500 text-xs font-medium whitespace-nowrap">
+            Tiempo Actual
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="pt-4 border-t border-[var(--border)]">
-        <div className="text-center text-xs text-[var(--muted-foreground)] leading-relaxed">
-          Costo = kWh+tarifa • CO₂ = kWh+factor • Ahorro = actual – simulado •
-          <br />
-          Pronóstico = promedio móvil
+      {/* Métricas por hora */}
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-4 rounded-lg border border-border/30" style={{ backgroundColor: 'rgba(255, 154, 158, 0.15)' }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: '#ff9a9e' }}>Consumo por Hora</p>
+              <p className="text-2xl font-bold" style={{ color: '#e08a8e' }}>127 kWh</p>
+            </div>
+            <div style={{ color: '#ff9a9e' }}>⚡</div>
+          </div>
+          <p className="text-xs mt-1" style={{ color: '#c67a7e' }}>Promedio última hora</p>
+        </div>
+
+        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-green-600 font-medium">Costo por Hora</p>
+              <p className="text-2xl font-bold text-green-700">$18.05</p>
+            </div>
+            <div className="text-green-500">💰</div>
+          </div>
+          <p className="text-xs text-green-600 mt-1">Basado en tarifa actual</p>
+        </div>
+
+        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-purple-600 font-medium">CO₂ por Hora</p>
+              <p className="text-2xl font-bold text-purple-700">57 kg</p>
+            </div>
+            <div className="text-purple-500">🌱</div>
+          </div>
+          <p className="text-xs text-purple-600 mt-1">Emisiones estimadas</p>
         </div>
       </div>
     </div>

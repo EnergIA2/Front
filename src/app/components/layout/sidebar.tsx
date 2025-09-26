@@ -6,9 +6,10 @@ import {
   Settings,
   FileText,
   Shield,
-  TrendingUp,
+  History,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Lightbulb
 } from "lucide-react"
 
 interface SidebarItem {
@@ -38,9 +39,9 @@ export function Sidebar({ activeSection, onSectionChange, onCollapseChange }: Si
       href: "dashboard"
     },
     {
-      icon: TrendingUp,
-      label: "Optimización",
-      href: "optimization"
+      icon: History,
+      label: "Historial",
+      href: "history"
     },
     {
       icon: Shield,
@@ -52,6 +53,11 @@ export function Sidebar({ activeSection, onSectionChange, onCollapseChange }: Si
       icon: FileText,
       label: "Reportes",
       href: "reports"
+    },
+    {
+      icon: Lightbulb,
+      label: "Recomendaciones",
+      href: "recommendations"
     }
   ]
 
