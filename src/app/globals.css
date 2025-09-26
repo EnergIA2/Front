@@ -1,64 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fefefe;
-  --foreground: #2d2d2d;
+  --background: #faf7f5;
+  --foreground: #2a2a2a;
+  --card: #ffffff;
 
-  /* Colores pasteles para modo claro */
-  --primary: #a3b5f7;
-  --primary-foreground: #2d3e6b;
-  --secondary: #e8f0ff;
-  --secondary-foreground: #4a5b78;
-  --muted: #f5f7fa;
+  /* Colores pasteles bonitos */
+  --primary: #ff9a9e;        /* Rosa coral suave */
+  --primary-foreground: #ffffff;
+  --secondary: #ffeaa7;      /* Amarillo pastel */
+  --secondary-foreground: #2d3748;
+  --muted: #f1f3f4;
   --muted-foreground: #64748b;
-  --accent: #b8e6b8;
-  --accent-foreground: #2d5a2d;
-  --destructive: #f7a3a3;
-  --destructive-foreground: #6b2d2d;
+  --accent: #a8e6cf;         /* Verde menta */
+  --accent-foreground: #2d3748;
+  --destructive: #ffb3ba;    /* Rosa suave */
+  --destructive-foreground: #2d3748;
   --border: #e2e8f0;
-  --input: #f1f5f9;
-  --ring: #a3b5f7;
-  --success: #a8e6a1;
-  --warning: #f5e1a4;
-  --info: #a3d5f7;
+  --input: #ffffff;
+  --ring: #ff9a9e;
+  --success: #a8e6cf;        /* Verde menta */
+  --warning: #ffdfba;        /* Melocotón */
+  --info: #bae1ff;          /* Azul cielo */
+  --orange: #ffdfba;         /* Naranja pastel */
+  --pink: #ffb3e6;          /* Rosa pastel */
+  --lavender: #d4a5ff;      /* Lavanda */
 
-  /* Gradientes energéticos */
-  --energy-gradient: linear-gradient(135deg, #a3b5f7, #b8e6b8);
-  --efficiency-gradient: linear-gradient(135deg, #b8e6b8, #a8e6a1);
-  --cost-gradient: linear-gradient(135deg, #f5e1a4, #f7a3a3);
+  /* Gradientes energéticos pasteles */
+  --energy-gradient: linear-gradient(135deg, #ff9a9e, #a8e6cf);
+  --efficiency-gradient: linear-gradient(135deg, #a8e6cf, #bae1ff);
+  --cost-gradient: linear-gradient(135deg, #ffdfba, #ffb3ba);
+  --rainbow-gradient: linear-gradient(135deg, #ff9a9e, #ffdfba, #a8e6cf, #bae1ff, #d4a5ff);
 }
 
 [data-theme="dark"] {
-  --background: #0f0f0f;
+  --background: #0a0a0a;
   --foreground: #f0f0f0;
+  --card: #1a1a1a;
 
-  /* Colores pasteles para modo oscuro */
-  --primary: #6b7db8;
-  --primary-foreground: #e8ebf5;
-  --secondary: #2a3441;
-  --secondary-foreground: #b8c5d6;
-  --muted: #1a1f26;
-  --muted-foreground: #8b9aab;
-  --accent: #5a8a5a;
-  --accent-foreground: #e8f5e8;
-  --destructive: #8a5a5a;
-  --destructive-foreground: #f5e8e8;
-  --border: #2d3439;
-  --input: #1e2328;
-  --ring: #6b7db8;
-  --success: #5a8a5a;
-  --warning: #8a7a4a;
-  --info: #5a7db8;
+  /* Colores pasteles para modo oscuro - más suaves */
+  --primary: #cc7a8b;        /* Rosa coral más oscuro */
+  --primary-foreground: #ffffff;
+  --secondary: #d4b896;      /* Amarillo más oscuro */
+  --secondary-foreground: #ffffff;
+  --muted: #2a2a2a;
+  --muted-foreground: #a0a0a0;
+  --accent: #85c7a3;         /* Verde menta oscuro */
+  --accent-foreground: #ffffff;
+  --destructive: #d19399;    /* Rosa suave oscuro */
+  --destructive-foreground: #ffffff;
+  --border: #404040;
+  --input: #2a2a2a;
+  --ring: #cc7a8b;
+  --success: #85c7a3;        /* Verde menta oscuro */
+  --warning: #d4b896;        /* Melocotón oscuro */
+  --info: #8fb8d4;          /* Azul cielo oscuro */
+  --orange: #d4b896;         /* Naranja pastel oscuro */
+  --pink: #d199c7;          /* Rosa pastel oscuro */
+  --lavender: #b085d4;      /* Lavanda oscuro */
 
   /* Gradientes energéticos modo oscuro */
-  --energy-gradient: linear-gradient(135deg, #6b7db8, #5a8a5a);
-  --efficiency-gradient: linear-gradient(135deg, #5a8a5a, #4a7a4a);
-  --cost-gradient: linear-gradient(135deg, #8a7a4a, #8a5a5a);
+  --energy-gradient: linear-gradient(135deg, #cc7a8b, #85c7a3);
+  --efficiency-gradient: linear-gradient(135deg, #85c7a3, #8fb8d4);
+  --cost-gradient: linear-gradient(135deg, #d4b896, #d19399);
+  --rainbow-gradient: linear-gradient(135deg, #cc7a8b, #d4b896, #85c7a3, #8fb8d4, #b085d4);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
   --color-muted: var(--muted);
