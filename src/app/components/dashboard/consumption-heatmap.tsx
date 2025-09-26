@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Clock, Zap, TrendingUp, TrendingDown, Calendar } from "lucide-react"
 import { useCityContext } from "../layout/city-selector"
 
@@ -18,7 +18,7 @@ export function ConsumptionHeatMap() {
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today')
   
   // Generar datos del mapa de calor
-  const generateHeatMapData = (): HeatMapData[] => {
+  const generateHeatMapData = useCallback((): HeatMapData[] => {
     const days = selectedPeriod === 'today' ? ['Hoy'] : 
                  selectedPeriod === 'week' ? ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] :
                  ['S1', 'S2', 'S3', 'S4'] // Semanas del mes
@@ -63,13 +63,13 @@ export function ConsumptionHeatMap() {
     })
     
     return data
-  }
+  }, [selectedPeriod])
 
   const [heatMapData, setHeatMapData] = useState<HeatMapData[]>(generateHeatMapData())
 
   useEffect(() => {
     setHeatMapData(generateHeatMapData())
-  }, [selectedPeriod, selectedCity])
+  }, [selectedPeriod, generateHeatMapData])
 
   // Obtener color basado en la intensidad
   const getHeatColor = (intensity: number): string => {
@@ -123,7 +123,7 @@ export function ConsumptionHeatMap() {
             ].map(period => (
               <button
                 key={period.key}
-                onClick={() => setSelectedPeriod(period.key as any)}
+                onClick={() => setSelectedPeriod(period.key as 'today' | 'week' | 'month')}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   selectedPeriod === period.key
                     ? 'bg-[var(--card)] text-[var(--primary)] shadow-sm'
@@ -201,7 +201,7 @@ export function ConsumptionHeatMap() {
             </div>
 
             {/* Heat Map Grid */}
-            {days.map((day, dayIndex) => (
+            {days.map((day) => (
               <div key={day} className="grid grid-cols-25 gap-1 mb-1">
                 {/* Day Label */}
                 <div className="w-16 text-sm font-medium text-[var(--foreground)] flex items-center">

@@ -1,12 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { formatCurrency } from "../../lib/utils"
 import {
   Brain,
   CheckCircle,
   AlertTriangle,
-  TrendingDown,
   Lightbulb,
   Clock,
   Zap,
@@ -25,7 +24,7 @@ interface Recommendation {
   savings: number
   implementation: string
   confidence: number
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   status: 'pending' | 'implementing' | 'completed'
 }
 

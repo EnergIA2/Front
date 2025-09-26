@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Line } from "react-chartjs-2"
 import {
   Chart as ChartJS,
@@ -81,7 +81,7 @@ export function RecentConsumptionChart() {
   ]
 
   // Generar datos de línea de tiempo
-  const generateTimelineData = () => {
+  const generateTimelineData = useCallback(() => {
     const baseValue = selectedCity === 'todas' ? 38 : 
                      selectedCity === 'lima' ? 12.8 :
                      selectedCity === 'arequipa' ? 10.4 : 15.3
@@ -91,7 +91,7 @@ export function RecentConsumptionChart() {
       const variation = Math.sin(index * 0.8) * 2 + Math.sin(index * 1.2) * 1.5
       return Math.max(baseValue + variation, baseValue * 0.8)
     })
-  }
+  }, [selectedCity, timeLabels])
 
   const [chartData, setChartData] = useState(() => ({
     labels: timeLabels,
@@ -179,7 +179,7 @@ export function RecentConsumptionChart() {
         data: generateTimelineData()
       }]
     }))
-  }, [selectedCity])
+  }, [selectedCity, generateTimelineData])
 
   const getStatusColor = (status: EquipmentData['status']) => {
     switch (status) {
@@ -276,7 +276,7 @@ export function RecentConsumptionChart() {
           Consumo por Equipo
         </h4>
         
-        {equipmentData.map((equipment, index) => (
+        {equipmentData.map((equipment) => (
           <div
             key={equipment.name}
             className="flex items-center justify-between p-3 rounded-lg bg-[var(--muted)] hover:bg-[var(--secondary)] transition-colors"

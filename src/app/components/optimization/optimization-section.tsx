@@ -26,7 +26,7 @@ interface OptimizationCard {
 }
 
 export function OptimizationSection() {
-  const { selectedCity, getCityData } = useCityContext()
+  const { selectedCity } = useCityContext()
   const [activeTab, setActiveTab] = useState<'recommendations' | 'predictions' | 'benchmarks'>('recommendations')
 
   // Datos de optimización basados en la ciudad seleccionada

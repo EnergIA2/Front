@@ -10,9 +10,7 @@ import {
   Search,
   Archive,
   Bell,
-  Settings,
   Eye,
-  EyeOff,
   Trash2
 } from "lucide-react"
 import { useCityContext } from "../layout/city-selector"
@@ -298,7 +296,7 @@ export function AlertsSection() {
           ].map(item => (
             <button
               key={item.key}
-              onClick={() => setFilter(item.key as any)}
+              onClick={() => setFilter(item.key as 'all' | 'unread' | 'critical' | 'archived')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 filter === item.key
                   ? 'bg-[var(--primary)] text-[var(--primary-foreground)]'
@@ -319,7 +317,7 @@ export function AlertsSection() {
           ].map(item => (
             <button
               key={item.key}
-              onClick={() => setCategoryFilter(item.key as any)}
+              onClick={() => setCategoryFilter(item.key as 'all' | 'energia' | 'dispositivos' | 'sistema' | 'eficiencia')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 categoryFilter === item.key
                   ? 'bg-[var(--accent)] text-[var(--accent-foreground)]'

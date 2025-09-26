@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Zap, TrendingDown, TrendingUp, DollarSign, AlertTriangle, MapPin, CheckCircle } from "lucide-react"
 import { useCityContext } from "../layout/city-selector"
 
@@ -18,7 +18,7 @@ export function EnergyMetrics() {
   const { selectedCity, cities, getCityData } = useCityContext()
   const [mounted, setMounted] = useState(false)
   
-  const getMetricsForCity = () => {
+  const getMetricsForCity = useCallback(() => {
     if (selectedCity === 'todas') {
       // Datos consolidados - solo las métricas más importantes
       const totalConsumption = cities.reduce((sum, city) => sum + city.consumption, 0)
@@ -106,7 +106,7 @@ export function EnergyMetrics() {
         }
       ]
     }
-  }
+  }, [selectedCity, cities, getCityData])
 
   const [metrics, setMetrics] = useState<EnergyMetric[]>(getMetricsForCity())
 
@@ -114,7 +114,7 @@ export function EnergyMetrics() {
   useEffect(() => {
     setMounted(true)
     setMetrics(getMetricsForCity())
-  }, [selectedCity, cities])
+  }, [selectedCity, cities, getMetricsForCity])
 
   // Simular datos en tiempo real - solo después del montaje para evitar hydration mismatch
   useEffect(() => {

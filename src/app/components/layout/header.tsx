@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Bell, Search } from "lucide-react"
+// import { useState } from "react"
+// import { Bell, Search } from "lucide-react"
 import { ThemeToggle } from "../theme-toggle"
 import { CitySelector } from "./city-selector"
 

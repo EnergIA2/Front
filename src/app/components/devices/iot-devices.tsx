@@ -8,7 +8,6 @@ import {
   ThermometerSun,
   Fan,
   Cpu,
-  Battery,
   Power,
   MoreVertical,
   Gauge
@@ -25,7 +24,7 @@ interface IoTDevice {
   temperature?: number
   humidity?: number
   brightness?: number
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
 }
 
 export function IoTDevices() {

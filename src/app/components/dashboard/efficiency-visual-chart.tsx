@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
+// import { useState } from "react"
 import { TrendingUp, Target, Award, AlertTriangle, CheckCircle } from "lucide-react"
-import { useCityContext } from "../layout/city-selector"
 
 interface EfficiencyData {
   category: string
@@ -14,7 +13,6 @@ interface EfficiencyData {
 }
 
 export function EfficiencyVisualChart() {
-  const { selectedCity } = useCityContext()
 
   const efficiencyData: EfficiencyData[] = [
     {

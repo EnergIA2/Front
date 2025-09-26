@@ -5,8 +5,6 @@ import {
   AlertTriangle,
   CheckCircle,
   Info,
-  Zap,
-  TrendingUp,
   Clock,
   X,
   Eye

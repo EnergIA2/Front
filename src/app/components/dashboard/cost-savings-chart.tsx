@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { DollarSign, TrendingDown, TrendingUp, Zap, Calendar, Target } from "lucide-react"
-import { useCityContext } from "../layout/city-selector"
+import { DollarSign, TrendingDown, Calendar, Target } from "lucide-react"
 
 interface CostData {
   period: string
@@ -13,7 +12,6 @@ interface CostData {
 }
 
 export function CostSavingsChart() {
-  const { selectedCity } = useCityContext()
   const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>('monthly')
 
   // Datos simulados de costos y ahorros

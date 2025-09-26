@@ -12,8 +12,6 @@ import {
   BarChart3,
   Users,
   Target,
-  Calendar,
-  Filter,
   RefreshCw
 } from "lucide-react"
 import { useCityContext } from "../layout/city-selector"
@@ -22,14 +20,14 @@ interface EmisCapability {
   id: string
   title: string
   description: string
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   status: 'active' | 'configured' | 'pending'
   color: string
 }
 
 export function EmisSection() {
   const { selectedCity, cities, getCityData } = useCityContext()
-  const [exportFormat, setExportFormat] = useState<'csv' | 'pdf' | 'excel'>('csv')
+  // const [exportFormat, setExportFormat] = useState<'csv' | 'pdf' | 'excel'>('csv')
   const [timeRange, setTimeRange] = useState('30d')
 
   const capabilities: EmisCapability[] = [
