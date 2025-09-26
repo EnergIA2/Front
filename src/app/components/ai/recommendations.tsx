@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { formatCurrency } from "../../lib/utils"
 import {
   Brain,
   CheckCircle,
@@ -136,17 +137,17 @@ export function AIRecommendations() {
   }
 
   return (
-    <div className="p-6 rounded-2xl glass-effect border border-[var(--border)]">
+    <div className="p-4 md:p-6 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--primary)20' }}>
             <Brain className="w-6 h-6" style={{ color: 'var(--primary)' }} />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-[var(--foreground)]">
+            <h2 className="text-lg md:text-xl font-semibold text-[var(--foreground)]">
               Recomendaciones IA
             </h2>
-            <p className="text-sm text-[var(--muted-foreground)]">
+            <p className="text-xs md:text-sm text-[var(--muted-foreground)]">
               Análisis automático de patrones energéticos
             </p>
           </div>
@@ -226,7 +227,7 @@ export function AIRecommendations() {
                     <div>
                       <span className="text-[var(--muted-foreground)]">Ahorro:</span>
                       <p className="font-medium text-[var(--success)]">
-                        ${rec.savings.toLocaleString()}
+                        {formatCurrency(rec.savings)}
                       </p>
                     </div>
                     <div>
@@ -278,7 +279,7 @@ export function AIRecommendations() {
             Ahorro total estimado:
           </span>
           <span className="font-semibold text-[var(--success)]">
-            ${recommendations.reduce((sum, rec) => sum + rec.savings, 0).toLocaleString()}/mes
+            {formatCurrency(recommendations.reduce((sum, rec) => sum + rec.savings, 0))}/mes
           </span>
         </div>
       </div>

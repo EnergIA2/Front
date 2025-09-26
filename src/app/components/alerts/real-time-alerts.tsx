@@ -173,11 +173,11 @@ export function RealTimeAlerts() {
   const unreadCount = alerts.filter(alert => !alert.isRead).length
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 max-w-[calc(100vw-2rem)] z-50">
+    <div className="fixed top-20 right-4 w-80 max-w-[calc(100vw-2rem)] z-40 max-h-[calc(100vh-6rem)] overflow-hidden">
       {/* Alert Counter */}
       {unreadCount > 0 && (
         <div className="mb-2 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-effect border border-[var(--border)]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--card)] border border-[var(--border)]">
             <div className="w-2 h-2 rounded-full bg-[var(--destructive)] animate-pulse"></div>
             <span className="text-sm font-medium text-[var(--foreground)]">
               {unreadCount} alertas nuevas
@@ -187,15 +187,15 @@ export function RealTimeAlerts() {
       )}
 
       {/* Alerts Stack */}
-      <div className="space-y-2 max-h-96 overflow-y-auto">
-        {alerts.slice(0, 5).map((alert, index) => {
+      <div className="space-y-2 max-h-80 overflow-y-auto">
+        {alerts.slice(0, 3).map((alert, index) => {
           const AlertIcon = getAlertIcon(alert.type)
-          const isVisible = index < 3 // Solo mostrar las primeras 3
+          const isVisible = true // Mostrar todas las alertas visibles
 
           return (
             <div
               key={alert.id}
-              className={`p-4 rounded-xl glass-effect border border-[var(--border)] animate-slide-up transition-all duration-300 ${
+              className={`p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] animate-slide-up transition-all duration-300 ${
                 !alert.isRead ? 'shadow-lg' : 'opacity-75'
               } ${!isVisible ? 'scale-95 opacity-50' : ''}`}
               style={{ animationDelay: `${index * 0.1}s` }}
@@ -268,10 +268,10 @@ export function RealTimeAlerts() {
         })}
       </div>
 
-      {alerts.length > 5 && (
+      {alerts.length > 3 && (
         <div className="mt-2 text-center">
-          <button className="text-xs text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors">
-            Ver {alerts.length - 5} alertas más
+          <button className="text-xs text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors px-3 py-1 rounded bg-[var(--muted)] hover:bg-[var(--secondary)]">
+            Ver {alerts.length - 3} alertas más
           </button>
         </div>
       )}

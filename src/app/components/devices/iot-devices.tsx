@@ -136,14 +136,14 @@ export function IoTDevices() {
   const totalConsumption = devices.reduce((sum, d) => sum + d.consumption, 0)
 
   return (
-    <div className="p-6 rounded-2xl glass-effect border border-[var(--border)]">
+    <div className="p-4 md:p-6 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-[var(--foreground)]">
+          <h2 className="text-lg md:text-xl font-semibold text-[var(--foreground)]">
             Dispositivos IoT
           </h2>
-          <p className="text-sm text-[var(--muted-foreground)] mt-1">
+          <p className="text-xs md:text-sm text-[var(--muted-foreground)] mt-1">
             {onlineDevices} de {devices.length} dispositivos activos
           </p>
         </div>

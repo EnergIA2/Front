@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Zap, TrendingDown, TrendingUp, DollarSign, Leaf, AlertTriangle } from "lucide-react"
+import { Zap, TrendingDown, TrendingUp, DollarSign, Leaf, AlertTriangle, MapPin, CheckCircle } from "lucide-react"
+import { useCityContext } from "../layout/city-selector"
 
 interface EnergyMetric {
   label: string
@@ -10,94 +11,179 @@ interface EnergyMetric {
   icon: React.ComponentType<any>
   color: string
   unit: string
+  status: 'Normal' | 'Alerta' | 'Crítico'
 }
 
 export function EnergyMetrics() {
-  const [metrics, setMetrics] = useState<EnergyMetric[]>([
-    {
-      label: "Consumo Actual",
-      value: "847.5",
-      change: -12.3,
-      icon: Zap,
-      color: "var(--primary)",
-      unit: "kWh"
-    },
-    {
-      label: "Eficiencia",
-      value: "89.2",
-      change: 5.7,
-      icon: Leaf,
-      color: "var(--success)",
-      unit: "%"
-    },
-    {
-      label: "Costo Mensual",
-      value: "12,450",
-      change: -8.4,
-      icon: DollarSign,
-      color: "var(--info)",
-      unit: "$"
-    },
-    {
-      label: "Ahorro AI",
-      value: "2,847",
-      change: 15.2,
-      icon: TrendingDown,
-      color: "var(--accent)",
-      unit: "$ ahorrados"
+  const { selectedCity, cities, getCityData } = useCityContext()
+  
+  const getMetricsForCity = () => {
+    if (selectedCity === 'todas') {
+      // Datos consolidados - solo las métricas más importantes
+      const totalConsumption = cities.reduce((sum, city) => sum + city.consumption, 0)
+      const totalCost = cities.reduce((sum, city) => sum + city.cost, 0)
+      
+      return [
+        {
+          label: "Consumo Hoy",
+          value: totalConsumption.toFixed(1),
+          change: -5.2,
+          icon: Zap,
+          color: "var(--primary)",
+          unit: "kWh • Todas las sedes",
+          status: 'Normal' as const
+        },
+        {
+          label: "Costo Diario",
+          value: "S/ " + (totalCost * 0.032).toFixed(0), // Aproximación diaria
+          change: -3.1,
+          icon: DollarSign,
+          color: "var(--orange)",
+          unit: "Tarifa promedio S/ 1.94",
+          status: 'Normal' as const
+        },
+        {
+          label: "Eficiencia Global",
+          value: "89.2",
+          change: 5.7,
+          icon: TrendingUp,
+          color: "var(--success)",
+          unit: "% • +12% vs sector",
+          status: 'Normal' as const
+        },
+        {
+          label: "Ahorro del Mes",
+          value: "S/ 2,847",
+          change: 15.2,
+          icon: TrendingDown,
+          color: "var(--info)",
+          unit: "Con optimización IA",
+          status: 'Normal' as const
+        }
+      ]
+    } else {
+      // Datos específicos de ciudad - métricas relevantes
+      const cityData = getCityData(selectedCity)
+      if (!cityData) return []
+      
+      return [
+        {
+          label: "Consumo Hoy",
+          value: cityData.consumption.toFixed(1),
+          change: -2.3,
+          icon: Zap,
+          color: "var(--primary)",
+          unit: `kWh • ${cityData.name}`,
+          status: cityData.status
+        },
+        {
+          label: "Costo Diario",
+          value: "S/ " + (cityData.cost * 0.032).toFixed(0),
+          change: -1.8,
+          icon: DollarSign,
+          color: "var(--orange)",
+          unit: "Tarifa S/ 1.94",
+          status: cityData.status
+        },
+        {
+          label: "Estado Operativo",
+          value: cityData.status,
+          change: cityData.status === 'Normal' ? 0 : -5.2,
+          icon: cityData.status === 'Normal' ? CheckCircle : AlertTriangle,
+          color: cityData.status === 'Normal' ? "var(--success)" : "var(--warning)",
+          unit: "Monitoreo en tiempo real",
+          status: cityData.status
+        },
+        {
+          label: "vs. Promedio",
+          value: "+12.3",
+          change: 3.1,
+          icon: TrendingUp,
+          color: "var(--info)",
+          unit: "% mejor que otras sedes",
+          status: cityData.status
+        }
+      ]
     }
-  ])
+  }
+
+  const [metrics, setMetrics] = useState<EnergyMetric[]>(getMetricsForCity())
+
+  // Actualizar métricas cuando cambia la ciudad seleccionada
+  useEffect(() => {
+    setMetrics(getMetricsForCity())
+  }, [selectedCity, cities])
 
   // Simular datos en tiempo real
   useEffect(() => {
     const interval = setInterval(() => {
       setMetrics(prev => prev.map(metric => ({
         ...metric,
-        value: metric.label === "Consumo Actual"
-          ? (parseFloat(metric.value) + (Math.random() - 0.5) * 20).toFixed(1)
+        value: metric.label.includes("Consumo")
+          ? (parseFloat(metric.value.replace(',', '')) + (Math.random() - 0.5) * 0.5).toFixed(2)
           : metric.value,
-        change: metric.change + (Math.random() - 0.5) * 2
+        change: metric.change + (Math.random() - 0.5) * 1
       })))
-    }, 3000)
+    }, 5000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [selectedCity])
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {metrics.map((metric, index) => (
         <div
           key={metric.label}
-          className="p-6 rounded-2xl glass-effect animate-slide-up hover:scale-105 transition-all duration-300 border border-[var(--border)] group"
-          style={{ animationDelay: `${index * 0.1}s` }}
+          className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] animate-slide-up hover:scale-[1.02] hover:shadow-md transition-all duration-300 group"
+          style={{
+            animationDelay: `${index * 0.1}s`
+          }}
         >
           <div className="flex items-center justify-between mb-4">
             <div
-              className="p-3 rounded-xl group-hover:scale-110 transition-transform duration-200"
+              className="p-2 rounded-lg transition-all duration-200"
               style={{ backgroundColor: `${metric.color}20` }}
             >
               <metric.icon
-                className="w-6 h-6"
+                className="w-5 h-5"
                 style={{ color: metric.color }}
               />
             </div>
-            <div className="flex items-center text-sm">
-              {metric.change >= 0 ? (
-                <TrendingUp className="w-4 h-4 text-[var(--success)] mr-1" />
-              ) : (
-                <TrendingDown className="w-4 h-4 text-[var(--destructive)] mr-1" />
-              )}
-              <span
-                className={`font-medium ${
-                  metric.change >= 0 ? 'text-[var(--success)]' : 'text-[var(--destructive)]'
-                }`}
-              >
-                {Math.abs(metric.change).toFixed(1)}%
-              </span>
+            <div className="flex items-center gap-2">
+              {/* Status indicator */}
+              <div className="flex items-center gap-1">
+                <div 
+                  className={`w-2 h-2 rounded-full ${
+                    metric.status === 'Normal' ? 'bg-[var(--success)]' :
+                    metric.status === 'Alerta' ? 'bg-[var(--warning)]' : 'bg-[var(--destructive)]'
+                  }`}
+                />
+                <span className={`text-xs font-medium ${
+                  metric.status === 'Normal' ? 'text-[var(--success)]' :
+                  metric.status === 'Alerta' ? 'text-[var(--warning)]' : 'text-[var(--destructive)]'
+                }`}>
+                  {metric.status}
+                </span>
+              </div>
+              
+              <div className="flex items-center text-sm">
+                {metric.change >= 0 ? (
+                  <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
+                ) : (
+                  <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
+                )}
+                <span
+                  className={`font-medium ${
+                    metric.change >= 0 ? 'text-green-600' : 'text-red-500'
+                  }`}
+                >
+                  {Math.abs(metric.change).toFixed(1)}%
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <h3 className="text-sm text-[var(--muted-foreground)] font-medium">
               {metric.label}
             </h3>
@@ -105,16 +191,26 @@ export function EnergyMetrics() {
               <span className="text-2xl font-bold text-[var(--foreground)]">
                 {metric.value}
               </span>
-              <span className="text-sm text-[var(--muted-foreground)]">
-                {metric.unit}
-              </span>
+            </div>
+            <div className="text-xs text-[var(--muted-foreground)]">
+              {metric.unit}
             </div>
           </div>
 
           {/* Indicador de tiempo real */}
-          <div className="mt-3 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse"></div>
-            <span className="text-xs text-[var(--muted-foreground)]">En vivo</span>
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse"></div>
+              <span className="text-xs text-[var(--muted-foreground)]">En vivo</span>
+            </div>
+            {selectedCity !== 'todas' && (
+              <div className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-[var(--primary)]" />
+                <span className="text-xs text-[var(--primary)]">
+                  {getCityData(selectedCity)?.name}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       ))}

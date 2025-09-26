@@ -85,7 +85,7 @@ export function EnergyChart() {
   }
 
   return (
-    <div className="col-span-full lg:col-span-2 p-6 rounded-2xl glass-effect border border-[var(--border)]">
+    <div className="w-full p-4 md:p-6 rounded-2xl bg-[var(--card)] border border-[var(--border)] shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-[var(--foreground)]">
           Consumo Energético
@@ -114,7 +114,7 @@ export function EnergyChart() {
         </div>
       </div>
 
-      <div className="h-80">
+      <div className="h-64 md:h-80">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'area' ? (
             <AreaChart data={data}>
