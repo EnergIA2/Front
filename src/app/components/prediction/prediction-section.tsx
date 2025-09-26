@@ -1,26 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { 
-  TrendingUp, 
-  Clock, 
-  Zap, 
-  DollarSign, 
-  Leaf, 
-  Calendar,
+import { useState } from "react"
+import {
+  TrendingUp,
+  Clock,
   Activity,
   AlertCircle,
   CheckCircle
 } from "lucide-react"
 import { useCityContext } from "../layout/city-selector"
 
-interface ForecastData {
-  time: string
-  consumption: number
-  cost: number
-  co2: number
-  confidence: number
-}
 
 interface HourlyForecast {
   hour: string
@@ -32,7 +21,7 @@ interface HourlyForecast {
 }
 
 export function PredictionSection() {
-  const { selectedCity, cities, getCityData } = useCityContext()
+  const { selectedCity } = useCityContext()
   const [timeHorizon, setTimeHorizon] = useState<'1h' | '24h' | '7d' | '30d'>('1h')
   const [currentTime] = useState(new Date())
 
@@ -142,7 +131,7 @@ export function PredictionSection() {
         <div className="flex items-center gap-3">
           <select
             value={timeHorizon}
-            onChange={(e) => setTimeHorizon(e.target.value as any)}
+            onChange={(e) => setTimeHorizon(e.target.value as '1h' | '24h' | '7d' | '30d')}
             className="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] text-sm"
           >
             <option value="1h">Próxima Hora</option>

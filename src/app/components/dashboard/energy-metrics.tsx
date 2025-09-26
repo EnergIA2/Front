@@ -16,6 +16,7 @@ interface EnergyMetric {
 
 export function EnergyMetrics() {
   const { selectedCity, cities, getCityData } = useCityContext()
+  const [mounted, setMounted] = useState(false)
   
   const getMetricsForCity = () => {
     if (selectedCity === 'todas') {
@@ -29,7 +30,7 @@ export function EnergyMetrics() {
           value: totalConsumption.toFixed(1),
           change: -5.2,
           icon: Zap,
-          color: "var(--primary)",
+          color: "#10B981", // Verde
           unit: "kWh • Todas las sedes",
           status: 'Normal' as const
         },
@@ -38,7 +39,7 @@ export function EnergyMetrics() {
           value: "S/ " + (totalCost * 0.032).toFixed(0), // Aproximación diaria
           change: -3.1,
           icon: DollarSign,
-          color: "var(--orange)",
+          color: "#F97316", // Naranja
           unit: "Tarifa promedio S/ 1.94",
           status: 'Normal' as const
         },
@@ -47,7 +48,7 @@ export function EnergyMetrics() {
           value: "89.2",
           change: 5.7,
           icon: TrendingUp,
-          color: "var(--success)",
+          color: "#10B981", // Verde
           unit: "% • +12% vs sector",
           status: 'Normal' as const
         },
@@ -56,7 +57,7 @@ export function EnergyMetrics() {
           value: "S/ 2,847",
           change: 15.2,
           icon: TrendingDown,
-          color: "var(--info)",
+          color: "#F97316", // Naranja
           unit: "Con optimización IA",
           status: 'Normal' as const
         }
@@ -72,7 +73,7 @@ export function EnergyMetrics() {
           value: cityData.consumption.toFixed(1),
           change: -2.3,
           icon: Zap,
-          color: "var(--primary)",
+          color: "#10B981", // Verde
           unit: `kWh • ${cityData.name}`,
           status: cityData.status
         },
@@ -81,7 +82,7 @@ export function EnergyMetrics() {
           value: "S/ " + (cityData.cost * 0.032).toFixed(0),
           change: -1.8,
           icon: DollarSign,
-          color: "var(--orange)",
+          color: "#F97316", // Naranja
           unit: "Tarifa S/ 1.94",
           status: cityData.status
         },
@@ -99,7 +100,7 @@ export function EnergyMetrics() {
           value: "+12.3",
           change: 3.1,
           icon: TrendingUp,
-          color: "var(--info)",
+          color: "#F97316", // Naranja
           unit: "% mejor que otras sedes",
           status: cityData.status
         }
@@ -109,25 +110,62 @@ export function EnergyMetrics() {
 
   const [metrics, setMetrics] = useState<EnergyMetric[]>(getMetricsForCity())
 
-  // Actualizar métricas cuando cambia la ciudad seleccionada
+  // Set mounted state and update metrics when city changes
   useEffect(() => {
+    setMounted(true)
     setMetrics(getMetricsForCity())
   }, [selectedCity, cities])
 
-  // Simular datos en tiempo real
+  // Simular datos en tiempo real - solo después del montaje para evitar hydration mismatch
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMetrics(prev => prev.map(metric => ({
-        ...metric,
-        value: metric.label.includes("Consumo")
-          ? (parseFloat(metric.value.replace(',', '')) + (Math.random() - 0.5) * 0.5).toFixed(2)
-          : metric.value,
-        change: metric.change + (Math.random() - 0.5) * 1
-      })))
-    }, 5000)
+    if (!mounted) return
+    
+    let interval: NodeJS.Timeout
+    
+    // Wait a bit before starting real-time updates to avoid hydration issues
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        setMetrics(prev => prev.map(metric => ({
+          ...metric,
+          value: metric.label.includes("Consumo")
+            ? (parseFloat(metric.value.replace(',', '')) + (Math.random() - 0.5) * 0.5).toFixed(2)
+            : metric.value,
+          change: metric.change + (Math.random() - 0.5) * 1
+        })))
+      }, 5000)
+    }, 2000)
 
-    return () => clearInterval(interval)
-  }, [selectedCity])
+    return () => {
+      clearTimeout(timeout)
+      if (interval) clearInterval(interval)
+    }
+  }, [selectedCity, mounted])
+
+  if (!mounted) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] animate-pulse"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 bg-[var(--muted)] rounded-lg"></div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[var(--muted)]"></div>
+                <div className="w-12 h-4 bg-[var(--muted)] rounded"></div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="w-24 h-4 bg-[var(--muted)] rounded"></div>
+              <div className="w-16 h-8 bg-[var(--muted)] rounded"></div>
+              <div className="w-32 h-3 bg-[var(--muted)] rounded"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

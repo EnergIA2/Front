@@ -36,45 +36,46 @@ interface EquipmentData {
 
 export function RecentConsumptionChart() {
   const { selectedCity } = useCityContext()
+  const [mounted, setMounted] = useState(false)
   const [timeLabels] = useState([
     '09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00'
   ])
 
-  // Datos simulados de consumo por equipo
+  // Datos simulados de consumo por equipo con paleta verde-naranja
   const equipmentData: EquipmentData[] = [
     {
       name: 'HVAC Principal',
       consumption: 15.2,
       percentage: 42,
-      color: '#3B82F6',
+      color: '#F97316', // Naranja principal para el mayor consumo
       status: 'high'
     },
     {
       name: 'Iluminación',
       consumption: 8.7,
       percentage: 24,
-      color: '#10B981',
+      color: '#10B981', // Verde principal
       status: 'normal'
     },
     {
       name: 'Equipos Oficina',
       consumption: 6.3,
       percentage: 17,
-      color: '#F59E0B',
+      color: '#FB923C', // Naranja claro
       status: 'normal'
     },
     {
       name: 'Servidores',
       consumption: 4.2,
       percentage: 12,
-      color: '#EF4444',
+      color: '#22C55E', // Verde claro
       status: 'normal'
     },
     {
       name: 'Otros',
       consumption: 1.8,
       percentage: 5,
-      color: '#8B5CF6',
+      color: '#16A34A', // Verde oscuro
       status: 'low'
     }
   ]
@@ -86,29 +87,30 @@ export function RecentConsumptionChart() {
                      selectedCity === 'arequipa' ? 10.4 : 15.3
 
     return timeLabels.map((_, index) => {
-      const variation = Math.sin(index * 0.8) * 2 + Math.random() * 1.5
+      // Use deterministic variation based on index and city to avoid hydration mismatch
+      const variation = Math.sin(index * 0.8) * 2 + Math.sin(index * 1.2) * 1.5
       return Math.max(baseValue + variation, baseValue * 0.8)
     })
   }
 
-  const [chartData, setChartData] = useState({
+  const [chartData, setChartData] = useState(() => ({
     labels: timeLabels,
     datasets: [
       {
         label: 'Consumo (kWh)',
         data: generateTimelineData(),
-        borderColor: 'rgb(59, 130, 246)',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: '#10B981', // Verde principal
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
         fill: true,
         tension: 0.4,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'rgb(59, 130, 246)',
+        pointBackgroundColor: '#10B981',
         pointBorderColor: '#ffffff',
         pointBorderWidth: 2
       }
     ]
-  })
+  }))
 
   const chartOptions = {
     responsive: true,
@@ -121,12 +123,12 @@ export function RecentConsumptionChart() {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
         titleColor: '#ffffff',
         bodyColor: '#ffffff',
-        borderColor: 'rgba(59, 130, 246, 0.5)',
+        borderColor: 'rgba(16, 185, 129, 0.5)',
         borderWidth: 1,
         cornerRadius: 8,
         displayColors: false,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: { parsed: { y: number } }) {
             return `${context.parsed.y.toFixed(2)} kWh`
           }
         }
@@ -155,8 +157,8 @@ export function RecentConsumptionChart() {
           font: {
             size: 11
           },
-          callback: function(value: any) {
-            return value.toFixed(1) + ' kWh'
+          callback: function(value: string | number) {
+            return Number(value).toFixed(1) + ' kWh'
           }
         }
       }
@@ -167,8 +169,9 @@ export function RecentConsumptionChart() {
     }
   }
 
-  // Actualizar datos cuando cambia la ciudad
+  // Set mounted state and update data when city changes
   useEffect(() => {
+    setMounted(true)
     setChartData(prev => ({
       ...prev,
       datasets: [{
@@ -192,6 +195,51 @@ export function RecentConsumptionChart() {
       case 'low': return 'Bajo'
       default: return 'Normal'
     }
+  }
+
+  if (!mounted) {
+    return (
+      <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h3 className="text-lg font-bold text-[var(--foreground)]">
+              Monitoreo en Tiempo Real
+            </h3>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              Consumo por equipos • Última hora
+            </p>
+          </div>
+          
+          <div className="text-right">
+            <div className="text-2xl font-bold text-[var(--foreground)]">
+              --.- kWh
+            </div>
+            <div className="text-xs text-[var(--muted-foreground)] flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-[var(--muted)]"></div>
+              Cargando...
+            </div>
+          </div>
+        </div>
+        <div className="h-48 mb-6 bg-[var(--muted)] rounded-lg animate-pulse"></div>
+        <div className="space-y-3 mb-4">
+          <h4 className="text-sm font-medium text-[var(--foreground)]">
+            Consumo por Equipo
+          </h4>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-[var(--muted)] animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded-full bg-[var(--secondary)]" />
+                <span className="w-20 h-4 bg-[var(--secondary)] rounded"></span>
+              </div>
+              <div className="text-right">
+                <div className="w-12 h-4 bg-[var(--secondary)] rounded mb-1"></div>
+                <div className="w-8 h-3 bg-[var(--secondary)] rounded"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -10,13 +10,13 @@ import { RecentConsumptionChart } from "./components/dashboard/recent-consumptio
 import { ConsumptionHeatMap } from "./components/dashboard/consumption-heatmap"
 import { EfficiencyVisualChart } from "./components/dashboard/efficiency-visual-chart"
 import { CostSavingsChart } from "./components/dashboard/cost-savings-chart"
-import { AnalyticsSection } from "./components/analytics/analytics-section"
 import { ReportsSection } from "./components/reports/reports-section"
 import { EmisSection } from "./components/emis/emis-section"
 import { PredictionSection } from "./components/prediction/prediction-section"
 import { AlertsSection } from "./components/alerts/alerts-section"
 import { OptimizationSection } from "./components/optimization/optimization-section"
 import { Chatbot } from "./components/chatbot/chatbot"
+import { LiveTime } from "./components/live-time"
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("dashboard")
@@ -35,23 +35,56 @@ export default function Home() {
       case "analytics":
         return (
           <div className="space-y-8">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-[var(--foreground)] mb-1">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">
                 Análisis Visual Avanzado
               </h1>
-              <p className="text-sm text-[var(--muted-foreground)]">
+              <p className="text-base text-[var(--muted-foreground)]">
                 Visualización inteligente de patrones, eficiencia y oportunidades de ahorro
               </p>
             </div>
-            
-            {/* Mapa de Calor */}
-            <ConsumptionHeatMap />
-            
-            {/* Eficiencia Visual */}
-            <EfficiencyVisualChart />
-            
-            {/* Análisis Costo-Beneficio */}
-            <CostSavingsChart />
+
+            {/* Grid Layout para mejor organización */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {/* Mapa de Calor - Ocupa todo el ancho en mobile, mitad en desktop */}
+              <div className="xl:col-span-2">
+                <div className="bg-gradient-to-r from-orange-50 to-green-50 dark:from-orange-950/20 dark:to-green-950/20 p-6 rounded-xl border-l-4 border-orange-500 mb-4">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-2 flex items-center gap-2">
+                    🔥 Patrones de Consumo por Hora
+                  </h2>
+                  <p className="text-sm text-[var(--muted-foreground)] mb-4">
+                    Identifica los picos de consumo y patrones de uso a lo largo del día
+                  </p>
+                </div>
+                <ConsumptionHeatMap />
+              </div>
+
+              {/* Eficiencia Visual */}
+              <div>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-6 rounded-xl border-l-4 border-green-500 mb-4">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-2 flex items-center gap-2">
+                    ⚡ Eficiencia Energética
+                  </h2>
+                  <p className="text-sm text-[var(--muted-foreground)] mb-2">
+                    Visualiza tu rendimiento energético comparado con estándares del sector
+                  </p>
+                </div>
+                <EfficiencyVisualChart />
+              </div>
+
+              {/* Análisis Costo-Beneficio */}
+              <div>
+                <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 p-6 rounded-xl border-l-4 border-orange-500 mb-4">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-2 flex items-center gap-2">
+                    💰 Análisis de Ahorros
+                  </h2>
+                  <p className="text-sm text-[var(--muted-foreground)] mb-2">
+                    Oportunidades de ahorro identificadas y proyección de beneficios
+                  </p>
+                </div>
+                <CostSavingsChart />
+              </div>
+            </div>
           </div>
         )
       case "settings":
@@ -91,7 +124,7 @@ export default function Home() {
                 <div className="text-right">
                   <div className="text-sm text-[var(--muted-foreground)]">Última actualización</div>
                   <div className="text-sm font-medium text-[var(--foreground)]">
-                    {new Date().toLocaleTimeString('es-PE')}
+                    <LiveTime />
                   </div>
                 </div>
               </div>
@@ -101,65 +134,69 @@ export default function Home() {
             <EnergyMetrics />
 
             {/* Quick Actions & Alerts */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
               {/* Quick Status */}
-              <div className="lg:col-span-2">
+              <div className="xl:col-span-2">
                 <RecentConsumptionChart />
               </div>
-              
+
               {/* Action Center */}
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-                  <h3 className="font-bold text-[var(--foreground)] mb-3">Acciones Rápidas</h3>
-                  <div className="space-y-2">
-                    <button 
+              <div className="space-y-6">
+                <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                  <h3 className="text-lg font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    ⚡ Acciones Rápidas
+                  </h3>
+                  <div className="space-y-3">
+                    <button
                       onClick={() => setActiveSection('optimization')}
-                      className="w-full p-3 text-left rounded-lg bg-[var(--success)]10 border border-[var(--success)]30 hover:bg-[var(--success)]20 transition-colors"
+                      className="w-full p-4 text-left rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border border-green-200 dark:border-green-800 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-950/30 dark:hover:to-emerald-950/30 transition-all duration-200"
                     >
-                      <div className="font-medium text-[var(--success)]">Ver Optimizaciones</div>
-                      <div className="text-xs text-[var(--muted-foreground)]">S/ 4,977/mes ahorro potencial</div>
+                      <div className="font-medium text-green-700 dark:text-green-300">Ver Optimizaciones</div>
+                      <div className="text-xs text-green-600 dark:text-green-400 mt-1">S/ 4,977/mes ahorro potencial</div>
                     </button>
-                    
-                    <button 
+
+                    <button
                       onClick={() => setActiveSection('alerts')}
-                      className="w-full p-3 text-left rounded-lg bg-[var(--warning)]10 border border-[var(--warning)]30 hover:bg-[var(--warning)]20 transition-colors"
+                      className="w-full p-4 text-left rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border border-orange-200 dark:border-orange-800 hover:from-orange-100 hover:to-amber-100 dark:hover:from-orange-950/30 dark:hover:to-amber-950/30 transition-all duration-200"
                     >
-                      <div className="font-medium text-[var(--warning)]">3 Alertas Activas</div>
-                      <div className="text-xs text-[var(--muted-foreground)]">Revisar base nocturna elevada</div>
+                      <div className="font-medium text-orange-700 dark:text-orange-300">3 Alertas Activas</div>
+                      <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">Revisar base nocturna elevada</div>
                     </button>
-                    
-                    <button 
+
+                    <button
                       onClick={() => setActiveSection('reports')}
-                      className="w-full p-3 text-left rounded-lg bg-[var(--muted)] hover:bg-[var(--secondary)] transition-colors"
+                      className="w-full p-4 text-left rounded-lg bg-[var(--muted)] hover:bg-[var(--secondary)] border border-[var(--border)] transition-all duration-200"
                     >
                       <div className="font-medium text-[var(--foreground)]">Generar Reporte</div>
-                      <div className="text-xs text-[var(--muted-foreground)]">Resumen mensual</div>
+                      <div className="text-xs text-[var(--muted-foreground)] mt-1">Resumen mensual</div>
                     </button>
                   </div>
                 </div>
 
                 {/* Current Status */}
-                <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-                  <h3 className="font-bold text-[var(--foreground)] mb-3">Estado Actual</h3>
-                  <div className="space-y-3">
+                <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-sm">
+                  <h3 className="text-lg font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+                    📊 Estado Actual
+                  </h3>
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-[var(--muted-foreground)]">Eficiencia</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 bg-[var(--muted)] rounded-full h-2">
-                          <div className="bg-[var(--success)] h-2 rounded-full w-[89%]"></div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-20 bg-[var(--muted)] rounded-full h-2.5">
+                          <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-2.5 rounded-full w-[89%]"></div>
                         </div>
-                        <span className="text-sm font-medium text-[var(--success)]">89%</span>
+                        <span className="text-sm font-bold text-green-600 min-w-[35px]">89%</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-[var(--muted-foreground)]">vs. Meta Sectorial</span>
-                      <span className="text-sm font-medium text-[var(--success)]">+12.2%</span>
+                      <span className="text-sm font-bold text-green-600">+12.2%</span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-[var(--muted-foreground)]">Ahorro Este Mes</span>
-                      <span className="text-sm font-medium text-[var(--info)]">S/ 2,847</span>
+                      <span className="text-sm font-bold text-orange-600">S/ 2,847</span>
                     </div>
                   </div>
                 </div>
@@ -171,28 +208,7 @@ export default function Home() {
               <EnergyChart />
             </div>
 
-            {/* Heat Map - Quick View */}
-            <div className="p-6 rounded-xl bg-[var(--card)] border border-[var(--border)]">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-[var(--foreground)]">
-                  Patrones de Consumo
-                </h3>
-                <button 
-                  onClick={() => setActiveSection('analytics')}
-                  className="text-sm text-[var(--primary)] hover:underline flex items-center gap-1"
-                >
-                  Ver análisis completo →
-                </button>
-              </div>
-              <div className="text-center py-8 bg-gradient-to-r from-[var(--muted)] to-[var(--secondary)] rounded-lg">
-                <div className="text-sm text-[var(--muted-foreground)] mb-2">
-                  Mapa de calor disponible en sección de Análisis
-                </div>
-                <div className="text-xs text-[var(--info)]">
-                  📊 Visualiza patrones por hora • 🎯 Identifica picos • 💰 Encuentra ahorros
-                </div>
-              </div>
-            </div>
+          
           </>
         )
     }
